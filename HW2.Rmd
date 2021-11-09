@@ -1,0 +1,83 @@
+---
+title: "HW2"
+author: "Rishabh Khurana"
+date: "11/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Initialization
+```{r}
+library(nycflights13)
+nycflights <- nycflights13::flights
+nyctemps <- nycflights13::weather
+library(ggplot2)
+```
+
+## #1: Scatter Plot
+```{r}
+p <- ggplot(nycflights, aes(arr_delay, dep_delay), na.rm=TRUE) + geom_point()
+p
+```
+
+
+This plot is descriptive of the relationship between arrival delay and departure delay. As we can see, the trend follows an approximately 1:1 pattern, implying that arrival delay will always be very close to departure delay in value. Furthermore, departure delay almost never exceeds arrival delay, as the only points that are not toeing the 1:1 line are below it. 
+
+
+## #2: Line Charts
+```{r}
+nyct2 <- nyctemps[nyctemps$origin == "EWR" & nyctemps$month == 1,]
+p2 <- ggplot(nyct2, aes(time_hour, temp), na.rm=TRUE) + geom_line()
+p2
+```
+
+
+This line chart is indicative of many patterns across the month of January 2013. First, we can easily see the cyclical element of the graph representing the day/night temperature fluctuation (peak at midday, valley at midnight). Furthermore, temperature levels vary between relatively stable high/lows and drastic multi-day shifts that bring the weekly average temperature up or down (e.g. around Jan 21 downwards, around Jan 28 upwards). 
+
+## #3: Histograms
+```{r}
+nyct3 <- nyctemps[nyctemps$origin == "EWR" & nyctemps$year == 2013, ]
+p3 <- ggplot(nyct3, aes(temp)) + geom_histogram(binwidth = 6, color="blue", fill="white")
+p3
+```
+
+
+This histogram gives us information about how temperature is distributed over the course of the year 2013. The normality of the distribution dictates that the temperature hovers around an average range - in this case from 35-80 degrees - and has approximately equal "tails" on either extreme of that range. 
+
+## #4: Boxplots
+```{r}
+p4 <- ggplot(nyct3, aes(temp, month, group=month)) + geom_boxplot()
+p4
+```
+
+
+This box plot is very effective in showcasing the shift in temperature ranges per month as the year progresses. The medians and maximum/minimum of each month follow the same approximate pattern: from winter in January to the peak of summer in June/July, temperature increases, and from that point to December temperature begins falling again. 
+In the year of 2013, July was definitively the hottest month, as its median was at the 75th percentile of both June and August. Meanwhile, January and December maintained approximately equal plots, which is agreeable with the season of winter going from December to February.  
+
+## #5: Barplots
+```{r}
+p5 <- ggplot(nycflights, aes(carrier)) + geom_bar(color = "yellow", fill = "black")
+p5
+```
+
+
+This graph helps us distinguish between the airline carriers that are major players in the industry and more minor, niche carriers. UA, EV, B6, and DL are all markedly above the rest (only 4 to cross the 40K threshold), while 9E, AA, MQ, and US make up a middle tier (15K+). One note of interest is that there are as many minor carriers as there are major/mid-tier carriers (8). This showcases that even though the major airlines are taking most of the volume, there were enough available niches for 8 other small carriers to still have some level of business (except OO). 
+
+
+```{r}
+nycmerge <- merge(nycflights, nyctemps, by="time_hour")
+nycmerge$tempcat <- round(nycmerge$temp / 20)
+nycmerge$delayed <- (nycmerge$arr_delay > 0)
+```
+
+```{r}
+p6 <- ggplot(nycmerge, aes(tempcat+(delayed*10))) + geom_bar()
+p6
+```
+
+
+I was very interested in the correlation between temperature and arrival delay. To create this, I decided to create two new variables. Temp Category is rounding temperature divided by 20, since most temperatures fall between 0 and 100. Delayed is just a boolean variable for whether the arrival delay is greater than 0. To differentiate the two temperature distributions, I had the x variable in the bar chart equal to temp category + delayed * 10, such that the delayed counts are on the right half of the graph. As visible, the count for delayed flights in temp categories 2-4 are vastly outnumbered by the non-delayed flights. However, for temp categories 1 and 5, the counts for delayed and non-delayed flights is about equal, implying that the extreme temperature ranges on either end have delayed flights at much higher odds than the middle ranges. 
+
