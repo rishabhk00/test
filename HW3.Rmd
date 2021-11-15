@@ -1,0 +1,40 @@
+---
+title: "HW3"
+author: "Rishabh Khurana"
+date: "11/14/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data <- read.csv("Diabetes.csv")
+library(ggplot2)
+data$gender <- as.factor(data$gender)
+data$location <- as.factor(data$location)
+data$frame <- as.factor(data$frame)
+```
+
+```{r}
+plot1 <- ggplot(data = data, mapping = aes(gender, ratio)) + geom_boxplot()
+data$whrat <- data$waist/data$hip
+plot2 <- ggplot(data = data, mapping = aes(whrat, chol)) + geom_point()
+plot3 <- ggplot(data = data, mapping = aes(height, weight)) + geom_point()
+```
+
+```{r}
+plot1
+```
+Plot 1 shows the differences in the distributions of the cholesterol HDL ratio based on gender. Using the box plot, we can see that males have a more varied distribution as opposed to females, along with a lower mean overall. 
+
+```{r}
+plot2
+```
+Plot 2 shows the distribution between Waist/Hip ratio and cholesterol levels. The distribution follows a weak positive correlation, as the cholesterol levels slightly rise as the ratio increases. 
+
+```{r}
+plot3
+```
+Plot 3 shows how weight and height are correlated in diabetes patients. As we can see, height and weight have a weak correlation. Furthermore, the vast majority of patients weigh between 150 and 200, which creates some doubt how prevalent obesity is in diabetes patients
